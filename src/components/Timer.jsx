@@ -3,28 +3,24 @@ import PropTypes from 'prop-types';
 
 const Timer = ({ timeLeft, setTimeLeft, onTimeout }) => {
   useEffect(() => {
-    // Ambil sisa waktu dari localStorage saat komponen dirender
     const savedTimeLeft = localStorage.getItem('timeLeft');
     if (savedTimeLeft) {
-      setTimeLeft(parseInt(savedTimeLeft, 10)); // Ubah dari string ke angka
+      setTimeLeft(parseInt(savedTimeLeft, 10));
     }
 
-    // Interval untuk mengurangi waktu
     const timerInterval = setInterval(() => {
       if (timeLeft > 0) {
         setTimeLeft((prevTimeLeft) => {
           const newTimeLeft = prevTimeLeft - 1;
-          // Simpan waktu yang tersisa ke localStorage
           localStorage.setItem('timeLeft', newTimeLeft);
           return newTimeLeft;
         });
       } else {
-        onTimeout(); // Ketika waktu habis, panggil fungsi timeout
-        clearInterval(timerInterval); // Hentikan interval saat waktu habis
+        onTimeout();
+        clearInterval(timerInterval);
       }
     }, 1000);
 
-    // Membersihkan interval saat komponen di-unmount
     return () => clearInterval(timerInterval);
   }, [timeLeft, setTimeLeft, onTimeout]);
 

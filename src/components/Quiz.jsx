@@ -9,16 +9,14 @@ const Quiz = () => {
   const [answers, setAnswers] = useState([]);
   const [shuffledAnswers, setShuffledAnswers] = useState([]);
   const [quizCompleted, setQuizCompleted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(300); // Default 5 minutes = 300 seconds
-  const [loading, setLoading] = useState(true); // State for loading
-  const [error, setError] = useState(null); // State for error handling
+  const [timeLeft, setTimeLeft] = useState(600);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Function to shuffle answers (save result for future restoration)
   const shuffleAnswers = (answers) => {
     return answers.sort(() => Math.random() - 0.5);
   };
 
-  // Save quiz state to localStorage
   const saveQuizState = () => {
     if (questions.length > 0) {
       const quizData = {
@@ -32,7 +30,6 @@ const Quiz = () => {
     }
   };
 
-  // Fetch questions on component mount
   useEffect(() => {
     const savedQuizData = localStorage.getItem('quizData');
 
@@ -43,7 +40,7 @@ const Quiz = () => {
       setCurrentQuestionIndex(savedCurrentQuestionIndex);
       setTimeLeft(savedTimeLeft);
       setShuffledAnswers(savedShuffledAnswers);
-      setLoading(false); // Data loaded from localStorage
+      setLoading(false);
     } else {
       fetch('https://opentdb.com/api.php?amount=10&category=20&type=multiple')
         .then((res) => {
@@ -55,22 +52,20 @@ const Quiz = () => {
         .then((data) => {
           if (data && data.results) {
             setQuestions(data.results);
-            // Initialize the shuffled answers for each question
             const shuffled = data.results.map((q) => shuffleAnswers([...q.incorrect_answers, q.correct_answer]));
             setShuffledAnswers(shuffled);
-            setLoading(false); // Data loaded successfully
+            setLoading(false);
           } else {
             throw new Error('Invalid data structure from API');
           }
         })
         .catch((err) => {
-          setError(err.message); // Set error state if there is a problem
+          setError(err.message);
           setLoading(false);
         });
     }
   }, []);
 
-  // Automatically save quiz state to localStorage on each update
   useEffect(() => {
     saveQuizState();
   }, [answers, currentQuestionIndex, timeLeft, questions, shuffledAnswers]);
@@ -81,27 +76,25 @@ const Quiz = () => {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
       setQuizCompleted(true);
-      localStorage.removeItem('quizData'); // Remove quiz data when completed
+      localStorage.removeItem('quizData');
     }
   };
 
   const handleTimeout = () => {
     setQuizCompleted(true);
-    localStorage.removeItem('quizData'); // Remove quiz data when completed
+    localStorage.removeItem('quizData');
   };
 
-  // Reset the quiz state
   const resetQuiz = () => {
     setCurrentQuestionIndex(0);
     setAnswers([]);
     setShuffledAnswers(questions.map((q) => shuffleAnswers([...q.incorrect_answers, q.correct_answer])));
-    setTimeLeft(600); // Reset timer to 5 minutes (300 seconds)
-    localStorage.removeItem('quizData'); // Clear saved quiz data
-    localStorage.removeItem('timeLeft'); // Clear saved timer
+    setTimeLeft(600);
+    localStorage.removeItem('quizData');
+    localStorage.removeItem('timeLeft');
     setQuizCompleted(false);
   };
 
-  // Check if question and shuffled answers are ready before rendering
   const isQuestionReady = questions[currentQuestionIndex] && shuffledAnswers[currentQuestionIndex];
 
   return (
