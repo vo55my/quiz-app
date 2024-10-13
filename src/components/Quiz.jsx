@@ -45,7 +45,7 @@ const Quiz = () => {
       setShuffledAnswers(savedShuffledAnswers);
       setLoading(false); // Data loaded from localStorage
     } else {
-      fetch('https://opentdb.com/api.php?amount=5&category=20&type=multiple')
+      fetch('https://opentdb.com/api.php?amount=10&category=20&type=multiple')
         .then((res) => {
           if (!res.ok) {
             throw new Error('Failed to fetch data');
@@ -95,8 +95,9 @@ const Quiz = () => {
     setCurrentQuestionIndex(0);
     setAnswers([]);
     setShuffledAnswers(questions.map((q) => shuffleAnswers([...q.incorrect_answers, q.correct_answer])));
-    setTimeLeft(300); // Reset timer
+    setTimeLeft(600); // Reset timer to 5 minutes (300 seconds)
     localStorage.removeItem('quizData'); // Clear saved quiz data
+    localStorage.removeItem('timeLeft'); // Clear saved timer
     setQuizCompleted(false);
   };
 

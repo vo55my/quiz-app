@@ -8,7 +8,7 @@ const Result = ({ total, answers, resetQuiz }) => {
     <div className="container result d-flex align-items-center justify-content-center flex-column">
       <div className="card text-center">
         <div className="card-header">
-          <h2>Quiz Completed!</h2>
+          <h2 className="fw-bold">Quiz Completed!</h2>
         </div>
         <div className="card-body fs-4">
           <p>Correct Answers: {correctAnswers}</p>

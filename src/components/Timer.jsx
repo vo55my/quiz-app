@@ -1,23 +1,32 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-const Timer = ({ onTimeout }) => {
-  const [timeLeft, setTimeLeft] = useState(600);
-
+const Timer = ({ timeLeft, setTimeLeft, onTimeout }) => {
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          onTimeout();
-          return 0;
-        }
-        return prev - 1;
-      });
+    // Ambil sisa waktu dari localStorage saat komponen dirender
+    const savedTimeLeft = localStorage.getItem('timeLeft');
+    if (savedTimeLeft) {
+      setTimeLeft(parseInt(savedTimeLeft, 10)); // Ubah dari string ke angka
+    }
+
+    // Interval untuk mengurangi waktu
+    const timerInterval = setInterval(() => {
+      if (timeLeft > 0) {
+        setTimeLeft((prevTimeLeft) => {
+          const newTimeLeft = prevTimeLeft - 1;
+          // Simpan waktu yang tersisa ke localStorage
+          localStorage.setItem('timeLeft', newTimeLeft);
+          return newTimeLeft;
+        });
+      } else {
+        onTimeout(); // Ketika waktu habis, panggil fungsi timeout
+        clearInterval(timerInterval); // Hentikan interval saat waktu habis
+      }
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [onTimeout]);
+    // Membersihkan interval saat komponen di-unmount
+    return () => clearInterval(timerInterval);
+  }, [timeLeft, setTimeLeft, onTimeout]);
 
   return (
     <div className="alert fs-4 border border-dark fw-bold">
@@ -27,6 +36,8 @@ const Timer = ({ onTimeout }) => {
 };
 
 Timer.propTypes = {
+  timeLeft: PropTypes.number.isRequired,
+  setTimeLeft: PropTypes.func.isRequired,
   onTimeout: PropTypes.func.isRequired,
 };
 
